@@ -2,7 +2,7 @@
 
 **Author Name**: Malek Abdelal
 
-## WRRC
+### WRRC
 ![WRRC](./assets/WRRC.png)
 
 ## Overview
@@ -17,3 +17,11 @@ Movie app that checks the latest movies based on categories.
 
 ## Project Features
 The app has two endpoints ( Home and favorite ) and return response for each other.
+
+------------------------------------------
+## Stage 2
+### 3rd Party API
+![WRRC](./assets/3rd%20Party%20API.png)
+
+## App progress
+Connect the application with 3rd party API.
