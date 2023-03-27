@@ -16,7 +16,7 @@ Movie app that checks the latest movies based on categories.
 - Run the server using node index.js
 
 ## Project Features
-The app has two endpoints ( Home and favorite ) and return response for each other.
+The app has two endpoints ( Home and favorite ) and returns response for each one.
 
 ------------------------------------------
 ## Stage 2
@@ -24,4 +24,5 @@ The app has two endpoints ( Home and favorite ) and return response for each oth
 ![WRRC](./assets/3rd%20Party%20API.png)
 
 ## App progress
-Connect the application with 3rd party API.
+1. Connect the application with 3rd party API.
+2. Connect the application with postgresql database (User becomes able to post & get to and from the database).
