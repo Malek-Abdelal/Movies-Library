@@ -3,18 +3,31 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const bodyParser = require('body-parser');
+const {Client} = require('pg');
 require('dotenv').config();
+
 const app = express();
 app.use(cors());
+app.use(bodyParser.urlencoded({extended : false}));
+app.use(bodyParser.json());
 const PORT = process.env.PORT;
+const DBPORT = process.env.DB_PORT;
+let dbUser = process.env.DB_USER;
+let dbPass = process.env.DB_PASS;
 let apiKey = process.env.API_KEY;
+let url = `postgres://${dbUser}:${dbPass}@localhost:${DBPORT}/dev`;
+const client = new Client(url);
 
 
 app.get('/trending', trendHandler);
 app.get("/search", searchHandler);
 app.get("/:movie_id/reviews", reviewsHandler);  //Some movies dosn't have a reviews, so try multiple IDs (Try for test, Id: 100)
 app.get("/top_rated", topRatdeHandler);
-
+app.post("/addMovie", addMovieHandler);
+app.get("/getMovies", getMovieHandler);
+app.get('*', notFoundErrorHandler);
+app.use(errorHandler);
 
 
 function trendHandler (req, res) {
@@ -29,7 +42,7 @@ function trendHandler (req, res) {
         res.json(movieInfo);
     })
     .catch((error) => {
-        (error.response.status === 404) ? res.status(404).json("The requested page doesn't exist."): (error.response.status === 500) ? res.status(500).json("Internal Server Error."): console.log(error)} );
+        errorHandler(error, req, res)});
 }
 
 
@@ -42,7 +55,7 @@ function searchHandler(req, res){
         res.json(searchResult);
     })
     .catch((error) => {
-        (error.response.status === 404) ? res.status(404).json("The requested page doesn't exist."): (error.response.status === 500) ? res.status(500).json("Internal Server Error."): console.log(error)} );
+        errorHandler(error, req, res)} );
 }
         
         
@@ -58,7 +71,7 @@ function reviewsHandler(req, res){
         res.json(reviewsResult);
     })
     .catch((error) => {
-        (error.response.status === 404) ? res.status(404).json("The requested page doesn't exist."): (error.response.status === 500) ? res.status(500).json("Internal Server Error."): console.log(error)} );
+        errorHandler(error, req, res)} );
 }
 
 
@@ -74,10 +87,44 @@ function topRatdeHandler (req, res) {
         res.json(movieInfo);
     })
     .catch((error) => {
-        (error.response.status === 404) ? res.status(404).json("The requested page doesn't exist."): (error.response.status === 500) ? res.status(500).json("Internal Server Error."): console.log(error)} );
+        errorHandler(error, req, res)} );
 }
-    
-            
+
+
+function addMovieHandler(req, res){
+
+    let {lang, title, overview, comments} = req.body; 
+    let values = [lang, title, overview, comments];
+    let sql = `INSERT INTO movies (lang, title, overview, comments)
+    VALUES ($1, $2, $3, $4) RETURNING *`;
+    client.query(sql, values).then((result) => {
+        res.status(201).json(result.rows);
+    })
+    .catch((error) => {
+        errorHandler(error, req, res)});
+}
+
+function getMovieHandler(req, res){
+    let sql = `SELECT * FROM movies`;
+    client.query(sql).then((success) => {
+        res.status(200).json(success.rows);
+    })
+    .catch( (error) => {
+        errorHandler(error, req, res)});
+}
+
+
+function notFoundErrorHandler(req, res){
+    res.status(404).send("Not Found");
+}
+
+
+function errorHandler(error, req, res){
+    res.status(500).send(error);
+}
+
+
+
 function TrendMovie (id, title, releaseDate, posterPath, overview){
     this.id = id;
     this.title = title;
@@ -101,6 +148,9 @@ function Reviews (author, rating, content){
 }
 
 
-app.listen(PORT, () => {
-    console.log("Welcome to my server");
+client.connect().then(() => {
+    app.listen(PORT, () => {
+        console.log("Welcome to my server");
+    })  
 })
+.catch();
