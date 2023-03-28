@@ -23,6 +23,13 @@ The app has two endpoints ( Home and favorite ) and returns response for each on
 ### 3rd Party API
 ![WRRC](./assets/3rd%20Party%20API.png)
 
+------------------- 
+## Stage 3
+### Database
+![WRRC](./assets/db.png)
+
+
 ## App progress
 1. Connect the application with 3rd party API.
 2. Connect the application with postgresql database (User becomes able to post & get to and from the database).
+3. Additional HTTP methods added (put & delete), so clients can edit or delete or get a specific record by Id.

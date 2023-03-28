@@ -26,8 +26,11 @@ app.get("/:movie_id/reviews", reviewsHandler);  //Some movies dosn't have a revi
 app.get("/top_rated", topRatdeHandler);
 app.post("/addMovie", addMovieHandler);
 app.get("/getMovies", getMovieHandler);
+app.put("/UPDATE/:id", updateMovieHandler);
+app.delete("/DELETE/:id", deleteMovieHandler);
+app.get("/getMovie/:id", getByIdHandler);
 app.get('*', notFoundErrorHandler);
-app.use(errorHandler);
+app.use(errorHandler); 
 
 
 function trendHandler (req, res) {
@@ -104,13 +107,56 @@ function addMovieHandler(req, res){
         errorHandler(error, req, res)});
 }
 
+
 function getMovieHandler(req, res){
     let sql = `SELECT * FROM movies`;
     client.query(sql).then((success) => {
-        res.status(200).json(success.rows);
+        res.json(success.rows);
     })
-    .catch( (error) => {
+    .catch((error) => {
         errorHandler(error, req, res)});
+}
+
+
+function updateMovieHandler(req, res){
+    let {id} = req.params;
+    let sql = `UPDATE movies
+    SET comments = $1
+    WHERE id = $2 RETURNING *`;
+    let {comments} = req.body;
+    let values = [comments, id];
+    client.query(sql, values).then(success => {
+        res.json(success.rows);
+    })
+    .catch((error) => {
+        errorHandler(error, req, res)})
+
+}
+
+
+function deleteMovieHandler(req, res){
+
+    let {id} = req.params;
+    let sql = `DELETE FROM movies
+    WHERE id = $1`;
+    let values = [id];
+    client.query(sql, values).then(() => {
+        res.status(204).send("Successfully deleted");
+    })
+    .catch()
+}
+
+
+function getByIdHandler(req, res){
+
+    let {id} = req.params;
+    let sql = `SELECT lang, title, overview, comments
+    FROM movies WHERE id = $1`;
+    let values = [id];
+    client.query(sql, values).then(success => {
+        res.json(success.rows);
+    })
+    .catch()
 }
 
 
