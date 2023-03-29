@@ -12,11 +12,11 @@ app.use(cors());
 app.use(bodyParser.urlencoded({extended : false}));
 app.use(bodyParser.json());
 const PORT = process.env.PORT;
-const DBPORT = process.env.DB_PORT;
-let dbUser = process.env.DB_USER;
-let dbPass = process.env.DB_PASS;
+// const DBPORT = process.env.DB_PORT;
+// let dbUser = process.env.DB_USER;
+// let dbPass = process.env.DB_PASS;
 let apiKey = process.env.API_KEY;
-let url = `postgres://${dbUser}:${dbPass}@localhost:${DBPORT}/dev`;
+let url = process.env.URL;
 const client = new Client(url);
 
 
